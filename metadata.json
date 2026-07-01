@@ -1,0 +1,6 @@
+{
+  "name": "Legacy Assessoria",
+  "description": "Assessoria de marketing de performance e crescimento empresarial. Transformamos sua empresa em uma máquina de vendas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
