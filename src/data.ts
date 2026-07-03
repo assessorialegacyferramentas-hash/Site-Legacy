@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { FAQItem, ServiceItem, PillarItem, WhyTrustItem, GrowthBenefit, GrowthPlan } from './types';
+import { FAQItem, ServiceItem, PillarItem, WhyTrustItem, GrowthBenefit, GrowthPlan, TestimonialItem } from './types';
 
 export const SECHOLDERS_SEGMENTS = [
   "Hotelaria",
@@ -132,55 +132,43 @@ export const PILLARS_LIST: PillarItem[] = [
 export const WHY_TRUST_LIST: WhyTrustItem[] = [
   {
     id: 1,
-    title: "Diagnóstico sem filtros",
-    description: "Análise realista dos gargalos do seu negócio, sem enrolação ou termos técnicos desnecessários."
+    title: "Foco Comercial",
+    description: "Sem métricas de vaidade ou ego. Nosso compromisso é com faturamento real e vendas."
   },
   {
     id: 2,
-    title: "Foco 100% comercial",
-    description: "Nenhuma métrica de ego. Nosso foco é exclusivamente faturamento, geração de leads e vendas."
+    title: "Time Sênior",
+    description: "Seu negócio acompanhado diretamente por estrategistas experientes, sem intermediários."
   },
   {
     id: 3,
-    title: "Especialistas Seniores",
-    description: "Seu negócio acompanhado por quem dita as melhores estratégias, sem intermediários juniores."
-  },
-  {
-    id: 4,
-    title: "Processo sob medida",
-    description: "Funis de vendas estruturados especificamente para o seu nicho, da atração à conversão."
-  },
-  {
-    id: 5,
-    title: "Transparência total",
-    description: "Clareza absoluta sobre investimentos e canais de retorno. Sem taxas ocultas na operação."
+    title: "Transparência",
+    description: "Clareza absoluta sobre investimentos, canais de retorno e métricas do seu funil."
   }
 ];
 
 export const BENEFITS_LIST: GrowthBenefit[] = [
   { id: 1, text: "Leads qualificados no WhatsApp todos os dias" },
   { id: 2, text: "Fim da dependência de indicações espontâneas" },
-  { id: 3, text: "Faturamento previsível e clareza de dados" },
-  { id: 4, text: "Métricas transparentes de retorno sobre o investimento" },
-  { id: 5, text: "Funil integrado otimizado, do anúncio ao CRM" },
-  { id: 6, text: "Crescimento sustentável e autoridade no seu nicho" }
+  { id: 3, text: "Faturamento previsível com clareza de dados" },
+  { id: 4, text: "Funil de vendas integrado, do anúncio ao CRM" }
 ];
 
 export const DIAGNOSTIC_STEPS = [
   {
     step: 1,
-    title: "Preenchimento do formulário",
-    description: "Você responde perguntas rápidas de diagnóstico para nossa equipe entender o exato momento comercial do seu negócio."
+    title: "Formulário Rápido",
+    description: "Responda perguntas simples sobre a situação atual do seu comercial."
   },
   {
     step: 2,
-    title: "Análise e agendamento",
-    description: "Nossa equipe analisa as informações em detalhes e entra em contato via WhatsApp para agendar um bate-papo estratégico."
+    title: "Análise Estratégica",
+    description: "Avaliamos suas respostas e entramos em contato diretamente via WhatsApp."
   },
   {
     step: 3,
-    title: "Reunião estratégica gratuita",
-    description: "Apresentamos uma direção tática 100% personalizada para sua empresa destravar novos canais de venda e otimizar investimentos."
+    title: "Plano de Ação",
+    description: "Apresentamos uma direção personalizada e prática para destravar suas vendas."
   }
 ];
 
@@ -252,5 +240,44 @@ export const FAQ_LIST: FAQItem[] = [
   {
     question: "Vocês fazem apenas tráfego pago?",
     answer: "Não. O tráfego pago (Meta Ads, Google Ads) é apenas um dos pilares de atração. A Legacy também trabalha com posicionamento estratégico, branding, funis de conversão, criação de páginas otimizadas, parametrização de CRM e consultoria comercial."
+  }
+];
+
+export const TESTIMONIALS: TestimonialItem[] = [
+  {
+    id: 1,
+    quote: "Antes da Legacy, a gente dependia muito da alta temporada e das indicações. Depois que começamos a estruturar melhor nosso marketing, conseguimos aparecer mais para o turista certo e receber mais contatos qualificados pelo WhatsApp. Hoje temos uma visão muito mais clara do que fazer para gerar reservas.",
+    signature: "— Rafael Monteiro, diretor de empresa de passeios turísticos",
+    niche: "Passeios Turísticos"
+  },
+  {
+    id: 2,
+    quote: "A Legacy nos ajudou a enxergar que não bastava ter uma boa estrutura. Precisávamos ser encontrados, transmitir confiança e transformar interesse em reserva. Com estratégia, tráfego e acompanhamento, começamos a ter mais previsibilidade na captação de hóspedes.",
+    signature: "— Camila Andrade, proprietária de pousada",
+    niche: "Hotelaria / Pousada"
+  },
+  {
+    id: 3,
+    quote: "No mercado imobiliário, velocidade e confiança fazem muita diferença. A Legacy organizou nossa comunicação, melhorou nossos anúncios e ajudou a gerar leads mais alinhados com o nosso perfil de imóvel. Hoje nosso comercial recebe oportunidades muito mais preparadas.",
+    signature: "— Gustavo Menezes, sócio-diretor imobiliário",
+    niche: "Mercado Imobiliário"
+  },
+  {
+    id: 4,
+    quote: "A gente tinha um projeto forte, mas faltava transformar isso em alcance e público. A Legacy ajudou a posicionar melhor o evento, criar uma comunicação mais clara e aumentar o interesse das pessoas. O marketing deixou de ser improviso e passou a ter direção.",
+    signature: "— Marina Queiroz, produtora cultural",
+    niche: "Mercado Cultural / Eventos"
+  },
+  {
+    id: 5,
+    quote: "A Legacy nos mostrou que postar comida bonita não era suficiente. Precisávamos de estratégia para atrair as pessoas certas, divulgar nossas ofertas e transformar visualização em movimento real no restaurante. O resultado foi uma comunicação mais profissional e mais clientes chegando.",
+    signature: "— Felipe Rocha, proprietário de restaurante",
+    niche: "Restaurante / Gastronomia"
+  },
+  {
+    id: 6,
+    quote: "A gente já tinha um bom serviço, mas não conseguia comunicar isso da forma certa. Com a Legacy, nossa presença digital ficou mais profissional, os anúncios começaram a gerar contatos melhores e conseguimos acompanhar melhor cada oportunidade. Foi um divisor de águas para o crescimento da clínica.",
+    signature: "— Juliana Martins, diretora de clínica especializada",
+    niche: "Clínica / Serviços"
   }
 ];

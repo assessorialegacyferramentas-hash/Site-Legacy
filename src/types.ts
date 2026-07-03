@@ -54,3 +54,11 @@ export interface GrowthPlan {
   contract: string;
   isPopular?: boolean;
 }
+
+export interface TestimonialItem {
+  id: number;
+  quote: string;
+  signature: string;
+  niche: string;
+}
+

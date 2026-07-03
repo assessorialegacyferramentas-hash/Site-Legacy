@@ -51,11 +51,10 @@ import {
   YES_US_LIST,
   SERVICES_LIST,
   PILLARS_LIST,
-  WHY_TRUST_LIST,
-  BENEFITS_LIST,
   DIAGNOSTIC_STEPS,
   GROWTH_PLANS,
-  FAQ_LIST
+  FAQ_LIST,
+  TESTIMONIALS
 } from "./data";
 
 import { DiagnosticLead } from "./types";
@@ -68,7 +67,7 @@ const DEFAULT_MOCK_LEADS: DiagnosticLead[] = [
     email: "rodrigo@hotelmarazul.com.br",
     phone: "(84) 99884-1234",
     companyName: "Hotel Mar Azul",
-    monthlyRevenue: "R$ 100.000 a R$ 250.000 / mês",
+    monthlyRevenue: "Acima de R$ 100 mil",
     niche: "Hotelaria & Turismo",
     status: "New",
     notes: "Lead muito interessado em anúncios de tráfego pago para reservas diretas de fim de ano. Solicitar faturamento exato na reunião.",
@@ -80,7 +79,7 @@ const DEFAULT_MOCK_LEADS: DiagnosticLead[] = [
     email: "contato@clinicasantate.com.br",
     phone: "(84) 99122-4567",
     companyName: "Clínica Santa Fé",
-    monthlyRevenue: "R$ 50.000 a R$ 100.000 / mês",
+    monthlyRevenue: "De R$ 50 mil a R$ 100 mil",
     niche: "Saúde & Estética",
     status: "Contacted",
     notes: "Feito primeiro contato por WhatsApp. Agendado bate-papo estratégico para próxima terça às 14h.",
@@ -92,7 +91,7 @@ const DEFAULT_MOCK_LEADS: DiagnosticLead[] = [
     email: "direcao@albuquerquemobiliaria.com",
     phone: "(84) 98765-4321",
     companyName: "Albuquerque Imóveis",
-    monthlyRevenue: "Acima de R$ 250.000 / mês",
+    monthlyRevenue: "Acima de R$ 100 mil",
     niche: "Imobiliário",
     status: "Closed",
     notes: "Fechado plano Elite! Quer acelerar a captação de leads para lançamentos de alto padrão em Ponta Negra.",
@@ -104,7 +103,7 @@ const DEFAULT_MOCK_LEADS: DiagnosticLead[] = [
     email: "marta@educamaisnatal.com.br",
     phone: "(84) 99445-9988",
     companyName: "Colégio Educa Mais",
-    monthlyRevenue: "R$ 100.000 a R$ 250.000 / mês",
+    monthlyRevenue: "Acima de R$ 100 mil",
     niche: "Educação",
     status: "Rejected",
     notes: "Ficou sem orçamento no momento atual devido a investimentos estruturais no colégio. Retomar contato em 6 meses.",
@@ -115,6 +114,9 @@ const DEFAULT_MOCK_LEADS: DiagnosticLead[] = [
 export default function App() {
   // CRM Leads State
   const [leads, setLeads] = useState<DiagnosticLead[]>([]);
+  
+  // Testimonials Carousel State
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -160,6 +162,14 @@ export default function App() {
       setLeads(DEFAULT_MOCK_LEADS);
       localStorage.setItem("legacy_assessoria_leads", JSON.stringify(DEFAULT_MOCK_LEADS));
     }
+  }, []);
+
+  // Testimonial Autoplay Carousel Effect (cycles every 6 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
 
   // Save leads to localStorage whenever updated
@@ -329,44 +339,6 @@ export default function App() {
       <div className="absolute top-[1800px] right-1/4 w-[400px] h-[400px] bg-[#00D084]/3 rounded-full blur-[100px] pointer-events-none -z-10" />
       <div className="absolute bottom-[800px] left-10 w-[300px] h-[300px] bg-[#00D084]/4 rounded-full blur-[90px] pointer-events-none -z-10" />
 
-      {/* HEADER NAV */}
-      <header className="sticky top-0 z-50 bg-[#121417]/90 backdrop-blur-md border-b border-white/5 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-            {/* BRAND LOGO */}
-            <div className="relative h-9 flex items-center">
-              <img
-                src="https://i.imgur.com/26lmRao.png"
-                alt="Legacy Assessoria Logo"
-                className="h-7 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <a
-              href="https://www.instagram.com/assessorialegacyy/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-white/60 hover:text-[#00D084] font-medium tracking-wide transition-all flex items-center space-x-1 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 hover:border-white/15"
-              id="lnk-instagram-header"
-            >
-              <span>Instagram</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </a>
-
-            <button
-              onClick={(e) => scrollToForm(e)}
-              className="hidden sm:inline-flex text-xs font-semibold bg-[#00D084] hover:bg-[#00D084]/90 text-[#121417] px-4 py-2 rounded-lg transition-all shadow-md shadow-[#00D084]/10 hover:shadow-[#00D084]/20"
-              id="btn-header-cta"
-            >
-              Fazer Diagnóstico
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* MAIN VIEW CONTROLLER */}
       <main className="flex-grow">
               
@@ -377,14 +349,6 @@ export default function App() {
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                   
-                  {/* Selo Pequeno */}
-                  <div className="flex justify-center md:justify-start mb-4">
-                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-[#00D084]/10 border border-[#00D084]/30 rounded-full text-[#00D084] text-[11px] font-semibold uppercase tracking-wider">
-                      <Sparkles className="w-3 h-3" />
-                      <span>Alta performance comercial</span>
-                    </span>
-                  </div>
-
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                     
                     {/* Left Column: Copy & Details */}
@@ -393,10 +357,6 @@ export default function App() {
                         Transformamos sua empresa em uma <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00D084] to-emerald-400">máquina de vendas</span>.
                       </h1>
                       
-                      <p className="text-base sm:text-lg text-white/70 max-w-2xl leading-relaxed">
-                        Estruturamos marketing, tráfego, funis e processos comerciais para gerar mais leads, clientes e faturamento com clareza e previsibilidade estratégica.
-                      </p>
-
                       {/* Microprovas / Diferenciais rápidos */}
                       <div className="pt-4 grid grid-cols-2 gap-4 max-w-lg mx-auto md:mx-0">
                         <div
@@ -585,11 +545,11 @@ export default function App() {
                                     }`}
                                   >
                                     <option value="" className="text-white/30">Selecione uma faixa...</option>
-                                    <option value="Até R$ 20.000 / mês">Até R$ 20.000 / mês</option>
-                                    <option value="R$ 20.000 a R$ 50.000 / mês">R$ 20.000 a R$ 50.000 / mês</option>
-                                    <option value="R$ 50.000 a R$ 100.000 / mês">R$ 50.000 a R$ 100.000 / mês</option>
-                                    <option value="R$ 100.000 a R$ 250.000 / mês">R$ 100.000 a R$ 250.000 / mês</option>
-                                    <option value="Acima de R$ 250.000 / mês">Acima de R$ 250.000 / mês</option>
+                                    <option value="Até R$ 10 mil">Até R$ 10 mil</option>
+                                    <option value="De R$ 10 mil a R$ 25 mil">De R$ 10 mil a R$ 25 mil</option>
+                                    <option value="De R$ 25 mil a R$ 50 mil">De R$ 25 mil a R$ 50 mil</option>
+                                    <option value="De R$ 50 mil a R$ 100 mil">De R$ 50 mil a R$ 100 mil</option>
+                                    <option value="Acima de R$ 100 mil">Acima de R$ 100 mil</option>
                                   </select>
                                   {formErrors.monthlyRevenue && (
                                     <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
@@ -671,12 +631,12 @@ export default function App() {
                   <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#121417] to-transparent z-10 pointer-events-none" />
                   
                   {/* Endless Horizontal Scroll Loop via custom CSS classes */}
-                  <div className="flex space-x-3 items-center whitespace-nowrap min-w-full animate-marquee">
-                    <div className="flex space-x-4 shrink-0 justify-around min-w-full items-center">
+                  <div className="flex space-x-3 sm:space-x-4 md:space-x-5 items-center whitespace-nowrap animate-marquee">
+                    <div className="flex space-x-3 sm:space-x-4 md:space-x-5 shrink-0 items-center">
                       {REAL_CLIENT_LOGOS.map((logoUrl, index) => (
                         <div
                           key={`logo-1-${index}`}
-                          className="h-14 sm:h-24 md:h-32 lg:h-40 w-28 sm:w-48 md:w-64 lg:w-80 flex items-center justify-center opacity-95 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out px-1"
+                          className="h-20 sm:h-22 md:h-24 lg:h-28 w-40 sm:w-44 md:w-48 lg:w-56 flex items-center justify-center opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out px-1.5"
                         >
                           <img
                             src={logoUrl}
@@ -687,11 +647,11 @@ export default function App() {
                         </div>
                       ))}
                     </div>
-                    <div className="flex space-x-4 shrink-0 justify-around min-w-full items-center" aria-hidden="true">
+                    <div className="flex space-x-3 sm:space-x-4 md:space-x-5 shrink-0 items-center" aria-hidden="true">
                       {REAL_CLIENT_LOGOS.map((logoUrl, index) => (
                         <div
                           key={`logo-2-${index}`}
-                          className="h-14 sm:h-24 md:h-32 lg:h-40 w-28 sm:w-48 md:w-64 lg:w-80 flex items-center justify-center opacity-95 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out px-1"
+                          className="h-20 sm:h-22 md:h-24 lg:h-28 w-40 sm:w-44 md:w-48 lg:w-56 flex items-center justify-center opacity-85 hover:opacity-100 hover:scale-105 transition-all duration-300 ease-out px-1.5"
                         >
                           <img
                             src={logoUrl}
@@ -716,25 +676,59 @@ export default function App() {
                       <div className="relative w-full max-w-sm">
                         <div className="absolute -inset-1 bg-gradient-to-r from-[#00D084]/30 to-emerald-500/20 rounded-2xl blur-md pointer-events-none opacity-70" />
                         
-                        <div className="relative bg-[#1a1d24] border border-white/10 rounded-2xl p-8 text-center space-y-6">
-                          <div className="h-16 flex items-center justify-center">
-                            <img
-                              src="https://i.imgur.com/26lmRao.png"
-                              alt="Legacy logo badge"
-                              className="h-10 w-auto object-contain"
-                              referrerPolicy="no-referrer"
-                            />
+                        <div className="relative bg-[#1a1d24] border border-white/10 rounded-2xl p-8 text-center flex flex-col justify-between min-h-[460px] md:min-h-[440px]">
+                          <div>
+                            <div className="h-12 flex items-center justify-center mb-4">
+                              <img
+                                src="https://i.imgur.com/26lmRao.png"
+                                alt="Legacy logo badge"
+                                className="h-8 w-auto object-contain"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                            <div className="h-[1px] bg-white/10 w-2/3 mx-auto mb-4" />
+                            
+                            <p className="text-xs font-mono text-[#00D084] tracking-wider uppercase mb-5">
+                              DEPOIMENTO — {TESTIMONIALS[currentTestimonialIndex].niche.toUpperCase()}
+                            </p>
+                            
+                            <div className="relative overflow-hidden min-h-[220px] sm:min-h-[180px] flex flex-col justify-center items-center">
+                              <AnimatePresence mode="wait">
+                                <motion.div
+                                  key={currentTestimonialIndex}
+                                  initial={{ opacity: 0, y: 15 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -15 }}
+                                  transition={{ duration: 0.35, ease: "easeOut" }}
+                                  className="space-y-4"
+                                >
+                                  <blockquote className="text-sm sm:text-base font-display font-medium text-white/95 leading-relaxed italic">
+                                    &ldquo;{TESTIMONIALS[currentTestimonialIndex].quote}&rdquo;
+                                  </blockquote>
+                                  
+                                  <p className="text-xs font-semibold text-white/60 tracking-wider">
+                                    {TESTIMONIALS[currentTestimonialIndex].signature}
+                                  </p>
+                                </motion.div>
+                              </AnimatePresence>
+                            </div>
                           </div>
-                          <div className="h-[1px] bg-white/10 w-2/3 mx-auto" />
-                          <p className="text-sm font-mono text-[#00D084] tracking-wider uppercase">
-                            Assessoria Estratégica B2B
-                          </p>
-                          <blockquote className="text-lg font-display font-medium text-white/90 italic">
-                            &ldquo;Transformamos sua empresa em uma máquina de vendas.&rdquo;
-                          </blockquote>
-                          <p className="text-xs text-white/40">
-                            Foco 100% em Geração de Demanda, Atração de Leads e Escala de Faturamento.
-                          </p>
+
+                          {/* Navigation Dots Indicator */}
+                          <div className="flex justify-center space-x-2.5 pt-4 border-t border-white/[0.03]">
+                            {TESTIMONIALS.map((_, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setCurrentTestimonialIndex(idx)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                  idx === currentTestimonialIndex
+                                    ? "bg-[#00D084] w-5"
+                                    : "bg-white/20 hover:bg-white/40"
+                                }`}
+                                aria-label={`Ir para depoimento ${idx + 1}`}
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -940,80 +934,20 @@ export default function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                   
                   {/* Master Heading */}
-                  <div className="text-center max-w-4xl mx-auto mb-16 space-y-4">
+                  <div className="text-center max-w-4xl mx-auto mb-12 space-y-4">
                     <span className="text-xs font-semibold text-[#00D084] tracking-wider uppercase">Fundamentos & Jornada</span>
                     <h2 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                       Sua empresa não precisa de mais tentativa. <br className="hidden sm:inline" />
                       Precisa de <span className="text-[#00D084]">direção comercial</span>.
                     </h2>
                     <p className="text-sm sm:text-base text-white/60 max-w-2xl mx-auto leading-relaxed">
-                      Conectamos estratégia, tráfego e processos de ponta a ponta. Conheça as nossas garantias, como agregamos valor ao seu negócio e os 3 passos simples da nossa jornada.
+                      Conectamos estratégia, tráfego e processos de ponta a ponta. Conheça a jornada de início simples em 3 passos para impulsionar e estruturar o comercial da sua empresa.
                     </p>
                   </div>
 
-                  {/* 3-Column Bento Grid Layout */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-12">
+                  {/* Centered Single Card Layout (Como Funciona) */}
+                  <div className="max-w-xl mx-auto mb-12">
                     
-                    {/* Column 1: WHY TRUST (Fundamentos) */}
-                    <div
-                      onClick={() => scrollToForm()}
-                      className="bg-[#16181f]/60 border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6 cursor-pointer hover:border-[#00D084]/30 hover:bg-[#16181f]/80 hover:scale-[1.01] transition-all duration-300"
-                    >
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2 text-[#00D084]">
-                          <Shield className="w-5 h-5" />
-                          <h3 className="text-base sm:text-lg font-display font-bold text-white">Por Que Confiar?</h3>
-                        </div>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Nossos pilares sólidos eliminam falsas promessas do mercado digital convencional:
-                        </p>
-                        
-                        <div className="space-y-4 pt-2">
-                          {WHY_TRUST_LIST.map((item) => (
-                            <div key={item.id} className="space-y-1 group">
-                              <h4 className="text-xs sm:text-sm font-display font-bold text-white group-hover:text-[#00D084] transition-colors flex items-center space-x-1.5">
-                                <span className="text-[10px] font-mono text-[#00D084]/60">0{item.id}.</span>
-                                <span>{item.title}</span>
-                              </h4>
-                              <p className="text-[11px] text-white/50 leading-relaxed pl-4">{item.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Column 2: HOW WE ADD VALUE (Como Agregamos) */}
-                    <div
-                      onClick={() => scrollToForm()}
-                      className="bg-[#16181f]/60 border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6 cursor-pointer hover:border-[#00D084]/30 hover:bg-[#16181f]/80 hover:scale-[1.01] transition-all duration-300"
-                    >
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2 text-[#00D084]">
-                          <CheckCircle className="w-5 h-5" />
-                          <h3 className="text-base sm:text-lg font-display font-bold text-white">Como Agregamos</h3>
-                        </div>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Atuamos cirurgicamente nos pontos de tração para destravar seu faturamento real:
-                        </p>
-
-                        <div className="space-y-3 pt-2">
-                          {BENEFITS_LIST.map((benefit) => (
-                            <div
-                              key={benefit.id}
-                              className="bg-[#1a1d24]/50 border border-white/5 rounded-xl p-3 flex items-start space-x-2.5 hover:border-[#00D084]/20 transition-all"
-                            >
-                              <div className="flex-shrink-0 w-4 h-4 rounded-full bg-[#00D084]/10 border border-[#00D084]/20 flex items-center justify-center text-[#00D084] mt-0.5">
-                                <Check className="w-2.5 h-2.5" />
-                              </div>
-                              <span className="text-xs text-white/80 font-medium leading-tight">
-                                {benefit.text}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
                     {/* Column 3: HOW IT WORKS (Como Funciona) */}
                     <div
                       onClick={() => scrollToForm()}
@@ -1160,6 +1094,11 @@ export default function App() {
                 <p>Natal, Rio Grande do Norte • Brasil</p>
                 <p className="text-[10px] font-mono">Sede física: Natal/RN</p>
               </div>
+              {/* LGPD Badge */}
+              <div className="flex items-center space-x-2 text-[10px] text-white/40 bg-white/[0.02] border border-white/5 px-2.5 py-1.5 rounded-md w-fit">
+                <Lock className="w-3 h-3 text-[#00D084]" />
+                <span>Dados protegidos (LGPD) • Conexão Segura</span>
+              </div>
             </div>
 
             {/* Coluna 2: Services links */}
@@ -1207,8 +1146,8 @@ export default function App() {
           {/* Copyright, credits and back to top */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
             <div>
-              <p>© 2026 Assessoria Legacy. Todos os direitos reservados.</p>
-              <p className="text-[10px] mt-0.5">Desenvolvido com padrão visual premium • Natal/RN</p>
+              <p>© {new Date().getFullYear()} Assessoria Legacy. Todos os direitos reservados.</p>
+              <p className="text-[10px] mt-0.5">Legacy Assessoria de Crescimento • CNPJ 53.842.129/0001-08 • Natal/RN</p>
             </div>
 
             <div className="flex items-center space-x-4">
