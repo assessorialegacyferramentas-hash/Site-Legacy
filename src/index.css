@@ -14,11 +14,13 @@
 }
 
 /* Custom visual refinements */
-body {
+html, body {
   background-color: var(--color-legacy-dark);
   color: var(--color-legacy-white);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
   scroll-behavior: smooth;
 }
 

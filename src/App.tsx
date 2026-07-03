@@ -329,7 +329,7 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121417] bg-grid text-[#F7F8FA] selection:bg-[#00D084] selection:text-[#121417] relative">
+    <div className="min-h-screen flex flex-col bg-[#121417] bg-grid text-[#F7F8FA] selection:bg-[#00D084] selection:text-[#121417] relative w-full max-w-full overflow-x-hidden">
       
       {/* Immersive UI Radial Gradient */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 70% 30%, rgba(0,208,132,0.08) 0%, transparent 50%)" }} />
