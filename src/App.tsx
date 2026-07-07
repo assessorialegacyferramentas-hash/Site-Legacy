@@ -131,6 +131,7 @@ export default function App() {
   // Form submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Accordion active index (FAQ)
@@ -220,14 +221,32 @@ export default function App() {
   };
 
   // Handle Form Submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    // Simulate elite server request delay
-    setTimeout(() => {
+    const payload = {
+      nome: formData.name,
+      email: formData.email,
+      whatsapp: formData.phone,
+      nomeEmpresa: formData.companyName,
+      nicho: formData.niche,
+      faturamento: formData.monthlyRevenue
+    };
+
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbzoKCWSx6S69lRUcs2lw8Z4bkqhJo6UqAb8jL5m6bGsU_zdEtFsHgJ4Ghi-fpB3i-N8DQ/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
       const newLead: DiagnosticLead = {
         id: `lead-${Date.now()}`,
         name: formData.name,
@@ -256,7 +275,11 @@ export default function App() {
         monthlyRevenue: "",
         niche: ""
       });
-    }, 1200);
+    } catch (err) {
+      console.error("Erro ao enviar dados para a planilha:", err);
+      setIsSubmitting(false);
+      setSubmitError("Não foi possível enviar agora. Tente novamente em alguns instantes.");
+    }
   };
 
   // CRM Actions
@@ -432,9 +455,9 @@ export default function App() {
                                   <CheckCircle className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-2">
-                                  <h4 className="text-lg font-bold text-white">Diagnóstico Solicitado!</h4>
-                                  <p className="text-xs text-white/70 max-w-sm mx-auto leading-relaxed">
-                                    Obrigado por enviar suas informações. Nossa equipe de especialistas em crescimento irá analisar seu ramo e faturamento. Entraremos em contato em até 24 horas úteis.
+                                  <h4 className="text-lg font-bold text-[#00D084]">Cadastro enviado com sucesso!</h4>
+                                  <p className="text-xs text-white/80 max-w-sm mx-auto leading-relaxed">
+                                    Nossa equipe vai entrar em contato pelo WhatsApp.
                                   </p>
                                 </div>
                                 <div className="pt-4 space-y-2">
@@ -599,6 +622,12 @@ export default function App() {
                                     </>
                                   )}
                                 </button>
+
+                                {submitError && (
+                                  <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center rounded-lg mt-2">
+                                    {submitError}
+                                  </div>
+                                )}
 
                                 {/* Microtexto de Segurança */}
                                 <p className="text-[10px] text-white/40 text-center leading-relaxed mt-2">
