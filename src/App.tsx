@@ -238,11 +238,11 @@ export default function App() {
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbzoKCWSx6S69lRUcs2lw8Z4bkqhJo6UqAb8jL5m6bGsU_zdEtFsHgJ4Ghi-fpB3i-N8DQ/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbz0VeHTrbRbXSbLscfKGp3LFOnBsHaWpy01lgRE35Q9wUkgcqSsp0UlqvWCFNE8RyVL/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "text/plain;charset=utf-8"
         },
         body: JSON.stringify(payload)
       });
