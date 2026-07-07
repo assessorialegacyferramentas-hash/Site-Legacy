@@ -238,7 +238,7 @@ export default function App() {
     };
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbz0VeHTrbRbXSbLscfKGp3LFOnBsHaWpy01lgRE35Q9wUkgcqSsp0UlqvWCFNE8RyVL/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbBXGo4tSYBkZylEmskJ2XasRAzGKPpoegl1Ll92Yw22LSGlOtzP5ssEC1Csb2GHwnoiQ/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
