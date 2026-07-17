@@ -185,9 +185,22 @@ export default function App() {
     heroFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
+  // Format WhatsApp helper
+  const formatWhatsApp = (value: string) => {
+    const clean = value.replace(/\D/g, "");
+    if (clean.length === 0) return "";
+    if (clean.length <= 2) return `(${clean}`;
+    if (clean.length <= 6) return `(${clean.slice(0, 2)}) ${clean.slice(2)}`;
+    if (clean.length <= 10) return `(${clean.slice(0, 2)}) ${clean.slice(2, 6)}-${clean.slice(6)}`;
+    return `(${clean.slice(0, 2)}) ${clean.slice(2, 7)}-${clean.slice(7, 11)}`;
+  };
+
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === "phone") {
+      value = formatWhatsApp(value);
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (formErrors[name]) {
       setFormErrors((prev) => {
@@ -201,23 +214,56 @@ export default function App() {
   // Basic Validation
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    if (!formData.name.trim()) errors.name = "Por favor, preencha seu nome comercial.";
+    if (!formData.name.trim()) {
+      errors.name = "Por favor, preencha seu nome comercial.";
+    }
+    
     if (!formData.email.trim()) {
       errors.email = "Por favor, insira seu e-mail comercial.";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       errors.email = "E-mail inválido. Utilize um formato padrão (ex: nome@empresa.com.br).";
     }
+    
+    const phoneDigits = formData.phone.replace(/\D/g, "");
     if (!formData.phone.trim()) {
       errors.phone = "Por favor, preencha o WhatsApp / Contato.";
-    } else if (formData.phone.replace(/\D/g, "").length < 10) {
+    } else if (phoneDigits.length < 10 || phoneDigits.length > 11) {
       errors.phone = "Por favor, insira um número válido com DDD.";
     }
-    if (!formData.companyName.trim()) errors.companyName = "Qual o nome da sua empresa?";
-    if (!formData.monthlyRevenue) errors.monthlyRevenue = "Selecione uma faixa de faturamento.";
-    if (!formData.niche.trim()) errors.niche = "Qual o seu nicho ou ramo de atuação?";
+    
+    if (!formData.companyName.trim()) {
+      errors.companyName = "Qual o nome da sua empresa?";
+    }
+    
+    if (!formData.monthlyRevenue) {
+      errors.monthlyRevenue = "Selecione uma faixa de faturamento.";
+    }
+    
+    if (!formData.niche.trim()) {
+      errors.niche = "Qual o seu nicho ou ramo de atuação?";
+    }
     
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    
+    if (Object.keys(errors).length > 0) {
+      const firstErrorField = Object.keys(errors)[0];
+      const idMap: Record<string, string> = {
+        name: "nome",
+        email: "email",
+        phone: "whatsapp",
+        companyName: "nomeEmpresa",
+        monthlyRevenue: "faturamento",
+        niche: "nicho"
+      };
+      const elementId = idMap[firstErrorField];
+      if (elementId) {
+        setTimeout(() => {
+          document.getElementById(elementId)?.focus();
+        }, 50);
+      }
+      return false;
+    }
+    return true;
   };
 
   // Handle Form Submit
@@ -228,33 +274,32 @@ export default function App() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    const payload = {
-      nome: formData.name,
-      email: formData.email,
-      whatsapp: formData.phone,
-      nomeEmpresa: formData.companyName,
-      nicho: formData.niche,
-      faturamento: formData.monthlyRevenue
-    };
+    const params = new URLSearchParams();
+    params.append("nome", formData.name.trim());
+    params.append("email", formData.email.trim());
+    params.append("contato", formData.phone.trim());
+    params.append("nomeEmpresa", formData.companyName.trim());
+    params.append("faturamento", formData.monthlyRevenue);
+    params.append("nicho", formData.niche.trim());
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbBXGo4tSYBkZylEmskJ2XasRAzGKPpoegl1Ll92Yw22LSGlOtzP5ssEC1Csb2GHwnoiQ/exec", {
+      await fetch("https://script.google.com/macros/s/AKfycbzu8t-swb57Stdg_pCJm-kT75eHfRtbkkppPI8C6UYTcICoFkpxjGyKkWxU8O_6hNiDiw/exec", {
         method: "POST",
         mode: "no-cors",
         headers: {
-          "Content-Type": "text/plain;charset=utf-8"
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         },
-        body: JSON.stringify(payload)
+        body: params.toString()
       });
 
       const newLead: DiagnosticLead = {
         id: `lead-${Date.now()}`,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        companyName: formData.companyName,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        companyName: formData.companyName.trim(),
         monthlyRevenue: formData.monthlyRevenue,
-        niche: formData.niche,
+        niche: formData.niche.trim(),
         status: "New",
         notes: "",
         createdAt: new Date().toISOString()
@@ -278,7 +323,7 @@ export default function App() {
     } catch (err) {
       console.error("Erro ao enviar dados para a planilha:", err);
       setIsSubmitting(false);
-      setSubmitError("Não foi possível enviar agora. Tente novamente em alguns instantes.");
+      setSubmitError("Não foi possível enviar sua solicitação. Verifique sua conexão e tente novamente.");
     }
   };
 
@@ -450,14 +495,14 @@ export default function App() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0 }}
                                 className="space-y-6 text-center py-8"
+                                aria-live="polite"
                               >
                                 <div className="w-14 h-14 bg-[#00D084]/15 text-[#00D084] rounded-full flex items-center justify-center mx-auto border border-[#00D084]/40">
                                   <CheckCircle className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-2">
-                                  <h4 className="text-lg font-bold text-[#00D084]">Cadastro enviado com sucesso!</h4>
-                                  <p className="text-xs text-white/80 max-w-sm mx-auto leading-relaxed">
-                                    Nossa equipe vai entrar em contato pelo WhatsApp.
+                                  <p className="text-sm font-semibold text-white/90 max-w-sm mx-auto leading-relaxed">
+                                    Solicitação enviada com sucesso! Nosso time entrará em contato para realizar seu diagnóstico comercial.
                                   </p>
                                 </div>
                                 <div className="pt-4 space-y-2">
@@ -474,19 +519,22 @@ export default function App() {
                                 
                                 {/* Nome */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nome do Responsável</label>
+                                  <label htmlFor="nome" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nome do Responsável</label>
                                   <input
                                     type="text"
+                                    id="nome"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     placeholder="Ex: Carlos Silva"
+                                    aria-invalid={formErrors.name ? "true" : "false"}
+                                    aria-describedby={formErrors.name ? "nome-error" : undefined}
                                     className={`form-input transition-all ${
                                       formErrors.name ? "border-red-500/50" : ""
                                     }`}
                                   />
                                   {formErrors.name && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="nome-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.name}</span>
                                     </p>
@@ -495,19 +543,22 @@ export default function App() {
 
                                 {/* E-mail Comercial */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">E-mail Comercial</label>
+                                  <label htmlFor="email" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">E-mail Comercial</label>
                                   <input
                                     type="email"
+                                    id="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     placeholder="Ex: carlos@empresa.com.br"
+                                    aria-invalid={formErrors.email ? "true" : "false"}
+                                    aria-describedby={formErrors.email ? "email-error" : undefined}
                                     className={`form-input transition-all ${
                                       formErrors.email ? "border-red-500/50" : ""
                                     }`}
                                   />
                                   {formErrors.email && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="email-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.email}</span>
                                     </p>
@@ -516,19 +567,22 @@ export default function App() {
 
                                 {/* WhatsApp */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">WhatsApp / Contato</label>
+                                  <label htmlFor="whatsapp" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">WhatsApp / Contato</label>
                                   <input
                                     type="text"
+                                    id="whatsapp"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
                                     placeholder="Ex: (84) 99999-9999"
+                                    aria-invalid={formErrors.phone ? "true" : "false"}
+                                    aria-describedby={formErrors.phone ? "whatsapp-error" : undefined}
                                     className={`form-input transition-all ${
                                       formErrors.phone ? "border-red-500/50" : ""
                                     }`}
                                   />
                                   {formErrors.phone && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="whatsapp-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.phone}</span>
                                     </p>
@@ -537,19 +591,22 @@ export default function App() {
 
                                 {/* Nome da Empresa */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nome da Empresa</label>
+                                  <label htmlFor="nomeEmpresa" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nome da Empresa</label>
                                   <input
                                     type="text"
+                                    id="nomeEmpresa"
                                     name="companyName"
                                     value={formData.companyName}
                                     onChange={handleInputChange}
                                     placeholder="Ex: Legacy Construtora"
+                                    aria-invalid={formErrors.companyName ? "true" : "false"}
+                                    aria-describedby={formErrors.companyName ? "nomeEmpresa-error" : undefined}
                                     className={`form-input transition-all ${
                                       formErrors.companyName ? "border-red-500/50" : ""
                                     }`}
                                   />
                                   {formErrors.companyName && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="nomeEmpresa-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.companyName}</span>
                                     </p>
@@ -558,24 +615,28 @@ export default function App() {
 
                                 {/* Faturamento Mensal Select */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Faturamento Mensal Estimado</label>
+                                  <label htmlFor="faturamento" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Faturamento Mensal Estimado</label>
                                   <select
+                                    id="faturamento"
                                     name="monthlyRevenue"
                                     value={formData.monthlyRevenue}
                                     onChange={handleInputChange}
+                                    aria-invalid={formErrors.monthlyRevenue ? "true" : "false"}
+                                    aria-describedby={formErrors.monthlyRevenue ? "faturamento-error" : undefined}
                                     className={`form-input transition-all appearance-none ${
                                       formErrors.monthlyRevenue ? "border-red-500/50" : ""
                                     }`}
                                   >
                                     <option value="" className="text-white/30">Selecione uma faixa...</option>
                                     <option value="Até R$ 10 mil">Até R$ 10 mil</option>
-                                    <option value="De R$ 10 mil a R$ 25 mil">De R$ 10 mil a R$ 25 mil</option>
-                                    <option value="De R$ 25 mil a R$ 50 mil">De R$ 25 mil a R$ 50 mil</option>
+                                    <option value="De R$ 10 mil a R$ 50 mil">De R$ 10 mil a R$ 50 mil</option>
                                     <option value="De R$ 50 mil a R$ 100 mil">De R$ 50 mil a R$ 100 mil</option>
-                                    <option value="Acima de R$ 100 mil">Acima de R$ 100 mil</option>
+                                    <option value="De R$ 100 mil a R$ 300 mil">De R$ 100 mil a R$ 300 mil</option>
+                                    <option value="De R$ 300 mil a R$ 500 mil">De R$ 300 mil a R$ 500 mil</option>
+                                    <option value="Acima de R$ 500 mil">Acima de R$ 500 mil</option>
                                   </select>
                                   {formErrors.monthlyRevenue && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="faturamento-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.monthlyRevenue}</span>
                                     </p>
@@ -584,19 +645,22 @@ export default function App() {
 
                                 {/* Nicho / Ramo */}
                                 <div className="space-y-1">
-                                  <label className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nicho / Ramo de Atuação</label>
+                                  <label htmlFor="nicho" className="block text-[11px] font-medium text-white/60 tracking-wider uppercase">Nicho / Ramo de Atuação</label>
                                   <input
                                     type="text"
+                                    id="nicho"
                                     name="niche"
                                     value={formData.niche}
                                     onChange={handleInputChange}
                                     placeholder="Ex: Medicina, Imobiliário, Comércio Local, etc."
+                                    aria-invalid={formErrors.niche ? "true" : "false"}
+                                    aria-describedby={formErrors.niche ? "nicho-error" : undefined}
                                     className={`form-input transition-all ${
                                       formErrors.niche ? "border-red-500/50" : ""
                                     }`}
                                   />
                                   {formErrors.niche && (
-                                    <p className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5">
+                                    <p id="nicho-error" className="text-[10px] text-red-400 flex items-center space-x-1 mt-0.5" aria-live="polite">
                                       <AlertCircle className="w-2.5 h-2.5" />
                                       <span>{formErrors.niche}</span>
                                     </p>
@@ -607,13 +671,13 @@ export default function App() {
                                 <button
                                   type="submit"
                                   disabled={isSubmitting}
-                                  className="w-full mt-4 btn-legacy text-sm font-semibold py-4 rounded-lg transition-all shadow-lg shadow-[#00D084]/15 hover:shadow-[#00D084]/25 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-75"
+                                  className="w-full mt-4 btn-legacy text-sm font-semibold py-4 rounded-lg transition-all shadow-lg shadow-[#00D084]/15 hover:shadow-[#00D084]/25 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                                   id="btn-submit-diagnostic"
                                 >
                                   {isSubmitting ? (
                                     <>
                                       <RefreshCw className="w-4 h-4 animate-spin" />
-                                      <span>Analisando mercado...</span>
+                                      <span>Enviando diagnóstico...</span>
                                     </>
                                   ) : (
                                     <>
@@ -624,7 +688,7 @@ export default function App() {
                                 </button>
 
                                 {submitError && (
-                                  <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center rounded-lg mt-2">
+                                  <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center rounded-lg mt-2" aria-live="polite">
                                     {submitError}
                                   </div>
                                 )}
